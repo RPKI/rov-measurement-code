@@ -37,8 +37,3 @@ Outputs:
 All results are in: 'results/analysis_results.txt'
 Format:
 <number of vantage points>|<number of non-rov AS>|<number of rov candidates>|<number of rov enforcers>|<number of false positive rov candidates>|<number of false positive rov enforcers>
-
-
-
-
-

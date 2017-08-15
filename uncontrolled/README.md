@@ -32,10 +32,10 @@ ftp://ftp.mi.fu-berlin.de/pub/reuter/20161001.as-rel.txt
 
 So overall usage:
 
+```
 ./path-diversity <bgp_data>  //outputs path_diversity.csv
-
 ./uncontrolled-rov-classification.py path_diversity.csv <bgp_data> <number of random vantage point sets to run analysis with>
-
+```
 
 Outputs:
 All results are in: 'results/analysis_results.txt'

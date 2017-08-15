@@ -3,8 +3,11 @@ published at [NDSS'17](https://www.internetsociety.org/sites/default/files/ndss2
 
 
 uncontrolled-rov-classification.py requires these arguments:
+
 path\_diversity : CSV file obtained by running path-diversity.py with **the same BGP RIB data that will be used for this script**
+
 as\_relationship : CAIDAs  AS relationship files found [here](http://data.caida.org/datasets/as-relationships/serial-1/)
+
 data : BGP RIB data annotated with RPKI information. Format is that of [bgpreader](https://bgpstream.caida.org/docs/tools/bgpreader)
 with an added field at the end that is a number between 0 and 5:
 

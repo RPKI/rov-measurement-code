@@ -1,5 +1,5 @@
 Replication of the methodology described in 'Are We There Yet? On RPKI's Deployment and Security' paper
-published at NDSS'17[https://www.internetsociety.org/sites/default/files/ndss2017\_06A-3\_Gilad\_paper.pdf].
+published at [NDSS'17](https://www.internetsociety.org/sites/default/files/ndss2017_06A-3_Gilad_paper.pdf).
 
 
 uncontrolled-rov-classification.py requires these arguments:
@@ -21,7 +21,7 @@ with an added field at the end that is a number between 0 and 5:
 Data used in our replication:
 
 BGP RIB Dump (annotated):
-ftp://ftp.mi.fu-berlin.de/pub/reuter/ris\_rv\_20161025.1600
+ftp://ftp.mi.fu-berlin.de/pub/reuter/ris_rv_20161025.1600
 
 CAIDA AS relationship data used:
 ftp://ftp.mi.fu-berlin.de/pub/reuter/20161001.as-rel.txt

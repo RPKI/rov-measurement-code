@@ -84,11 +84,11 @@ RESTART OF EXPERIMENT DUE TO BUGS: 2017-07-25
 |147.28.249.0/24|  All peers of seattle01 | INVALID between 04:00 UTC and 12:00 UTC, else VALID |
 
 
-=================
+---------------
 
 
 ## Data
 
-All data is publicly available via RIPE RIS and RouteViews collectors. We recommend using bgpstream[https://bgpstream.caida.org/] to obtain it. An overview over our announcement timing can be seen at RIPEstat [https://stat.ripe.net/widget/routing-history#w.resource=147.28.240.0%2F20&w.starttime=2016-05-15T00%3A00%3A00&w.endtime=2017-08-30T00%3A00%3A00].
+All data is publicly available via RIPE RIS and RouteViews collectors. We recommend using [bgpstream](https://bgpstream.caida.org/) to obtain it. An overview over our announcement timing can be seen at [RIPEstat] (https://stat.ripe.net/widget/routing-history#w.resource=147.28.240.0%2F20&w.starttime=2016-05-15T00%3A00%3A00&w.endtime=2017-08-30T00%3A00%3A00).
 
 The 'route_changes_direct' scripts take BGP data as input and will output a number of vantage points that *could* be using ROV to filter. Individual examination is required as of now since one AS filtering invalids might cause other AS with vantage points to seem like they are filtering as well.

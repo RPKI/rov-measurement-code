@@ -1,5 +1,10 @@
 
-Implementation of methodologies described in https://arxiv.org/pdf/1706.04263.pdf
+# Towards a Rigorous Methodology for Measuring Adoption of RPKI Route Validation and Filtering
+This page documents the methodologies discussed in [1] and provides codes and data to replicate the
+results from the paper. All referenced code can be found [here](https://github.com/RPKI/rov-measurement-code).
+
+[1] A. Reuter, R. Bush, I. Cunha, E. Katz-Bassett, T.C. Schmidt, M. Wählisch, Towards a Rigorous Methodology for Measuring Adoption of RPKI Route Validation and Filtering, ACM CCR 2018, Accepted to be published.
+
 All code is written for Python 3.x and depends on python module [reuter_util](https://github.com/reuteran/reuter_util)
 
 # Uncontrolled Experiments

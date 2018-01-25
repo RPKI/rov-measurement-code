@@ -1,0 +1,134 @@
+---
+experiment_id: 5
+description : "Find AS with policy to drop invalid routes"
+superprefix: "147.28.240.0/20"
+prefixes:
+    - "147.28.240.0/24"
+    - "147.28.241.0/24"
+    - "147.28.242.0/24"
+    - "147.28.243.0/24"
+    - "147.28.244.0/24"
+    - "147.28.245.0/24"
+    - "147.28.246.0/24"
+    - "147.28.247.0/24"
+    - "147.28.248.0/24"
+    - "147.28.249.0/24"
+
+prefix_pairs:
+  -
+    anchor: "147.28.240.0/24"
+    experiment: "147.28.241.0/24"
+  -
+    anchor: "147.28.242.0/24"
+    experiment: "147.28.244.0/24"
+  -
+    anchor: "147.28.243.0/24"
+    experiment: "147.28.245.0/24"
+  -
+    anchor: "147.28.246.0/24"
+    experiment: "147.28.247.0/24"
+  -
+    anchor: "147.28.248.0/24"
+    experiment: "147.28.249.0/24"
+roas:
+    147.28.240.0/24:
+        -
+          asn: 47065
+          max_len: 24
+          period:
+            start: "-"
+            end: "-"
+    147.28.241.0/24:
+        -
+          asn: 47065
+          max_len: 24
+          period:
+            start: "12:00 UTC"
+            end: "04:00 UTC"
+        -
+          asn: 51224
+          max_len: 24
+          period:
+            start: "04:00 UTC"
+            end: "12:00 UTC"
+    147.28.242.0/24:
+        -
+          asn: 47065
+          max_len: 24
+          period:
+            start: "-"
+            end: "-"
+    147.28.244.0/24:
+        -
+          asn: 47065
+          max_len: 24
+          period:
+            start: "12:00 UTC"
+            end: "04:00 UTC"
+        -
+          asn: 51224
+          max_len: 24
+          period:
+            start: "04:00 UTC"
+            end: "12:00 UTC"
+    147.28.243.0/24:
+        -
+          asn: 47065
+          max_len: 24
+          period:
+            start: "-"
+            end: "-"
+    147.28.245.0/24:
+        -
+          asn: 47065
+          max_len: 24
+          period:
+            start: "12:00 UTC"
+            end: "04:00 UTC"
+        -
+          asn: 51224
+          max_len: 24
+          period:
+            start: "04:00 UTC"
+            end: "12:00 UTC"
+    147.28.246.0/24:
+        -
+          asn: 47065
+          max_len: 24
+          period:
+            start: "-"
+            end: "-"
+    147.28.247.0/24:
+        -
+          asn: 47065
+          max_len: 24
+          period:
+            start: "12:00 UTC"
+            end: "04:00 UTC"
+        -
+          asn: 51224
+          max_len: 24
+          period:
+            start: "04:00 UTC"
+            end: "12:00 UTC"
+    147.28.248.0/24:
+        -
+          asn: 47065
+          max_len: 24
+          period:
+            start: "-"
+            end: "-"
+    147.28.249.0/24:
+        -
+          asn: 47065
+          max_len: 24
+          period:
+            start: "12:00 UTC"
+            end: "04:00 UTC"
+        -
+          asn: 51224
+          max_len: 24
+          period:
+            start: "04:00 UTC"
+            end: "12:00 UTC"
+...

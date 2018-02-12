@@ -46,6 +46,20 @@ def read_experiment_config_files(config_file_dir):
     return config_files
 
 
+def raw_data_to_str(rd):
+    comm = rd[10]
+    if comm != 'NULL':
+        comm = "'{0}'".format(comm)
+
+    args = "'{0}', {1}, '{2}', '{3}', {4}, '{5}', '{6}', '{7}', {8}, {9}, {10}".format(rd[0], rd[1], rd[2],
+                                                                                       rd[3], rd[4], rd[5],
+                                                                                       rd[6], rd[7], rd[8],
+                                                                                       rd[9], comm)
+    return args
+
+
+def analysis_results_to_str(res):
+    return "'{0}', {1}, '{2}', '{3}', '{4}'".format(res[0], res[1], res[2], res[3], res[4])
 
 
 def get_connect_str_from_config(db_config):
@@ -83,6 +97,8 @@ def init_stream(config_files, start_time, end_time):
 
 
 def get_bgp_data_from_stream(config_files, start, end):
+    raw_data = []
+    vp_routes = defaultdict(lambda: defaultdict(dict))
     all_experiment_prefixes = set()
     for exp_id in config_files:
         config_file = config_files[exp_id]
@@ -95,12 +111,27 @@ def get_bgp_data_from_stream(config_files, start, end):
         elem = rec.get_next_elem()
         while elem:
             if elem.type == "R" and elem.fields['prefix'] in all_experiment_prefixes:
-                vp = (elem.peer_asn, elem.peer_address)
+                peer_asn = elem.peer_asn
+                peer_ip = elem.peer_address
+                vp = (peer_asn, peer_ip)
+                prefix = elem.fields['prefix']
+                as_path = bgp.remove_prepending_from_as_path(elem.fields['as-path'])
+                path_len = len(as_path.split(' '))
+                origin_asn = int(as_path.split(' ')[-1])
+                communities = [str(comm['asn']) + ':' + str(comm['value']) for comm in elem.fields['communities']]
+                communities = ' '.join(communities)
+                if communities == '':
+                    communities = 'NULL'
+
                 timestamp = elem.time
                 timestamp = timestamp - (timestamp % 3600)
-                as_path = elem.fields['as-path']
-                prefix = elem.fields['prefix']
+                day = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d')
                 vp_routes[vp][prefix][timestamp] = as_path
+                collector = rec.collector
+                project = rec.project
+                vp_routes[vp][prefix][timestamp] = as_path
+                raw_data.append((day, timestamp, project, collector, peer_asn, peer_ip, prefix,
+                                 as_path, path_len, origin_asn, communities))
             elem = rec.get_next_elem()
     return vp_routes
 
@@ -196,63 +227,8 @@ def analyze_experiment5(config, vp_routes, day):
     return case1_results
 
 
-def read_vps_from_file(filename):
-    vps = set()
-    with open(filename, 'r') as f:
-        for line in f:
-            line = line.split('|')
-            vp = (int(line[0].rstrip()), line[1].rstrip())
-            vps.add(vp)
-    return vps
-
-
-def insert_analysis_results_to_db(dbname, dbuser, dbpw, dbhost, tablename, data):
+def update_exp5_stats(case1_results, connect_str):
     try:
-        connect_str = "dbname='{0}' user='{1}' host='{2}' password='{3}'".format(dbname, dbuser, dbhost, dbpw)
-        conn = psycopg2.connect(connect_str)
-        cursor = conn.cursor()
-
-        for d in data:
-            args = "('{0}', {1}, '{2}', '{3}', '{4}')".format(d[0], d[1], d[2], d[3], d[4])
-            insert_statement = """INSERT INTO {0} VALUES """.format(tablename)
-            cursor.execute(insert_statement + args)
-        conn.commit()
-        cursor.close()
-        conn.close()
-    except Exception as e:
-        print("ERROR: Can't connect to DB.")
-        print(e)
-        exit()
-
-
-def insert_raw_data_to_db(dbname, dbuser, dbpw, dbhost, raw_data):
-    try:
-        connect_str = "dbname='{0}' user='{1}' host='{2}' password='{3}'".format(dbname, dbuser, dbhost, dbpw)
-        conn = psycopg2.connect(connect_str)
-        cursor = conn.cursor()
-
-        for rd in raw_data:
-            if rd[10] != 'NULL':
-                comm = "'{0}'".format(rd[10])
-            else:
-                comm = rd[9]
-            args = "('{0}', {1}, '{2}', '{3}', {4}, '{5}', '{6}', '{7}', {8}, {9}, {10})".format(rd[0], rd[1], rd[2],
-                                                                                                 rd[3], rd[4], rd[5],
-                                                                                                 rd[6], rd[7], rd[8],
-                                                                                                 rd[9], comm)
-            cursor.execute("""INSERT INTO raw_data VALUES """ + args)
-        conn.commit()
-        cursor.close()
-        conn.close()
-    except Exception as e:
-        print("ERROR: Can't connect to DB.")
-        print(e)
-        exit()
-
-
-def update_exp5_stats(dbname, dbuser, dbpw, dbhost, case1_results):
-    try:
-        connect_str = "dbname='{0}' user='{1}' host='{2}' password='{3}'".format(dbname, dbuser, dbhost, dbpw)
         conn = psycopg2.connect(connect_str)
         cursor = conn.cursor()
 
@@ -283,20 +259,45 @@ def update_exp5_stats(dbname, dbuser, dbpw, dbhost, case1_results):
         exit()
 
 
+def insert_into_db_table(args_str, tablename, connect_str):
+    try:
+        conn = psycopg2.connect(connect_str)
+        cursor = conn.cursor()
+        for arg in args_str:
+            sql_insert = "INSERT INTO " + tablename + " VALUES (" + arg + ")"
+            cursor.execute(sql_insert)
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print("ERROR: Can't connect to DB.")
+        print(e)
+        exit()
+
+
 def main(args):
     args = parse_arguments(args)
     config_files = read_experiment_config_files(args.experiment_configs)
-    raw_data, vp_routes = get_bgp_data_from_file(config_files, 'data/2018-01-01-exp5.ribs')
-    #insert_raw_data_to_db('ovsdb', 'ovs-tester', 'ovs', 'localhost', raw_data)
-    add_missing_routes(config_files, vp_routes, args.day)
 
+    #raw_data, vp_routes = get_bgp_data_from_file(config_files, 'data/2018-01-01-exp5.ribs')
+
+    midnight = timegm(datetime.strptime(args.day, '%Y-%m-%d').utctimetuple())
+    next_midnight = midnight + (60 * 60 * 24)
+    raw_data, vp_routes = get_bgp_data_from_stream(config_files, midnight, next_midnight - 1)
 
     with open(args.db_config, 'r') as f:
         db_config = json.load(f)
 
+    insert_into_db_table([raw_data_to_str(rd) for rd in raw_data], 'raw_data', get_connect_str_from_config(db_config))
+    add_missing_routes(config_files, vp_routes, args.day)
     case1_results = analyze_experiment5(config_files[5], vp_routes, args.day)
-    #insert_analysis_results_to_db('ovsdb', 'ovs-tester', 'localhost', 'localhost', 'exp5_case_1', case1_results)
-    update_exp5_stats('ovsdb', 'ovs-tester', 'localhost', 'localhost', case1_results)
+
+    insert_into_db_table([raw_data_to_str(rd) for rd in raw_data], 'raw_data', get_connect_str_from_config(db_config))
+    insert_into_db_table([analysis_results_to_str(rd) for rd in case1_results], 'exp5_case_1',
+                         get_connect_str_from_config(db_config))
+
+    update_exp5_stats(case1_results, get_connect_str_from_config(db_config))
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

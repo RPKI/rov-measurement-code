@@ -46,6 +46,16 @@ def read_experiment_config_files(config_file_dir):
     return config_files
 
 
+
+
+def get_connect_str_from_config(db_config):
+    return "dbname='{0}' user='{1}' host='{2}' password='{3}' port='{4}'".format(db_config['db_name'],
+                                                                                 db_config['db_user'],
+                                                                                 db_config['db_host'],
+                                                                                 db_config['db_pwd'],
+                                                                                 db_config['db_port'])
+
+
 def add_missing_routes(config_files, vp_routes, day):
     for vp in vp_routes:
         for exp_id in config_files:

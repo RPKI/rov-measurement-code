@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from reuter_util import bgp
 from calendar import timegm
 from collections import defaultdict
+import json
 import psycopg2
 
 
@@ -29,6 +30,7 @@ def parse_arguments(args):
     parser = argparse.ArgumentParser()
     parser.add_argument("experiment_configs", help="Directory with YAML experiment config files")
     parser.add_argument("day", help="Day to analyse data from. Format %Y-%m-%d")
+    parser.add_argument("db_config", help="db_config.json")
     return parser.parse_args(args)
 
 
@@ -277,6 +279,10 @@ def main(args):
     raw_data, vp_routes = get_bgp_data_from_file(config_files, 'data/2018-01-01-exp5.ribs')
     #insert_raw_data_to_db('ovsdb', 'ovs-tester', 'ovs', 'localhost', raw_data)
     add_missing_routes(config_files, vp_routes, args.day)
+
+
+    with open(args.db_config, 'r') as f:
+        db_config = json.load(f)
 
     case1_results = analyze_experiment5(config_files[5], vp_routes, args.day)
     #insert_analysis_results_to_db('ovsdb', 'ovs-tester', 'localhost', 'localhost', 'exp5_case_1', case1_results)

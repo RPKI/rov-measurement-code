@@ -133,7 +133,7 @@ def get_bgp_data_from_stream(config_files, start, end):
                 raw_data.append((day, timestamp, project, collector, peer_asn, peer_ip, prefix,
                                  as_path, path_len, origin_asn, communities))
             elem = rec.get_next_elem()
-    return vp_routes
+    return vp_routes, raw_data
 
 
 def get_bgp_data_from_file(config_files, filename):

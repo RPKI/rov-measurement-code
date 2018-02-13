@@ -310,7 +310,8 @@ def main(args):
     insert_into_db_table([analysis_results_to_str(rd) for rd in case1_results], 'exp5_case_1',
                          get_connect_str_from_config(db_config))
 
-    update_exp5_stats(case1_results, get_connect_str_from_config(db_config))
+    update_marked_vp_stats(get_connect_str_from_config(db_config))
+
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))

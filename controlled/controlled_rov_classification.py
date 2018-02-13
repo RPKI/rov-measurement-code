@@ -227,32 +227,45 @@ def analyze_experiment5(config, vp_routes, day):
     return case1_results
 
 
-def update_exp5_stats(case1_results, connect_str):
+def update_marked_vp_stats(connect_str):
     try:
         conn = psycopg2.connect(connect_str)
         cursor = conn.cursor()
 
-        vps = [(r[1], r[2]) for r in case1_results]
-        for vp in vps:
-            sql_data_dates = "SELECT DISTINCT day FROM raw_data WHERE (vp_asn="+str(vp[0])+" AND vp_ip='"+vp[1]+"')"
-            cursor.execute(sql_data_dates)
-            data_dates = set(cursor.fetchall())
+        sql_select = "SELECT vp_asn, vp_ip FROM exp5_case_1;"
+        cursor.execute(sql_select)
+        vps = set(cursor.fetchall())
 
-            sql_marked_dates = "SELECT DISTINCT day FROM exp5_case_1 WHERE (vp_asn="+str(vp[0])+" AND vp_ip='"+vp[1]+"')"
-            cursor.execute(sql_marked_dates)
-            marked_dates = set(cursor.fetchall())
+        for (vp_asn, vp_ip) in vps:
 
-            marked_perc = len(data_dates.intersection(marked_dates))/len(data_dates)
-            len_data_dates = len(data_dates)
-            len_marked_dates = len(marked_dates)
+            # Get all data dates:
+            sql_select = "SELECT DISTINCT day FROM raw_data WHERE (vp_asn = {0} AND vp_ip = '{1}')".format(vp_asn, vp_ip)
+            cursor.execute(sql_select)
+            data_dates = set([res[0] for res in cursor.fetchall()])
+            latest_measured = max(data_dates).strftime("%Y-%m-%d")
 
-            args = "(" + str(vp[0]) + ",'" + vp[1] + "',"+ str(len_data_dates) + "," + str(len_marked_dates) + ","
-            args += str(marked_perc) + ")"
-            sql_insert_stats = "INSERT INTO exp5_case_1_vp_stats VALUES " + args
+            # Get all marked dates:
+            sql_select = "SELECT DISTINCT day FROM exp5_case_1 WHERE (vp_asn = {0} AND vp_ip = '{1}')".format(vp_asn, vp_ip)
+            cursor.execute(sql_select)
+            marked_dates = set([res[0] for res in cursor.fetchall()])
+            latest_marked = max(marked_dates).strftime("%Y-%m-%d")
+
+            marked_ratio = len(marked_dates)/float(len(data_dates))
+            sql_insert_stats = "INSERT INTO exp5_case_1_vp_stats VALUES "
+            sql_insert_stats += "({0}, '{1}', {2}, {3}, {4}, '{5}', '{6}')".format(vp_asn, vp_ip, len(data_dates),
+                                                                                   len(marked_dates), marked_ratio,
+                                                                                   latest_measured, latest_marked)
+            sql_insert_stats += " ON CONFLICT ON CONSTRAINT vp_unique "
+            sql_insert_stats += " DO UPDATE SET data_dates = {0},".format(len(data_dates))
+            sql_insert_stats += " marked_dates = {0},".format(len(marked_dates))
+            sql_insert_stats += " marked_ratio = {0},".format(marked_ratio)
+            sql_insert_stats += " last_marked = '{0}',".format(latest_marked)
+            sql_insert_stats += " last_measured = '{0}';".format(latest_measured)
             cursor.execute(sql_insert_stats)
         conn.commit()
         cursor.close()
         conn.close()
+
     except Exception as e:
         print("ERROR: Can't connect to DB.")
         print(e)

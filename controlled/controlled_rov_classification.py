@@ -262,6 +262,28 @@ def update_marked_vp_stats(connect_str):
             sql_insert_stats += " last_marked = '{0}',".format(latest_marked)
             sql_insert_stats += " last_measured = '{0}';".format(latest_measured)
             cursor.execute(sql_insert_stats)
+
+            sql_select = "SELECT anchor_prefix, experiment_prefix FROM exp5_case_1 "
+            sql_select += "WHERE (vp_asn = {0} AND vp_ip = '{1}' AND day = '{2}');".format(vp_asn, vp_ip, latest_marked)
+            cursor.execute(sql_select)
+            prefixes = cursor.fetchall()
+            notes = ""
+            if ('147.28.243.0/24', '147.28.245.0/24') in prefixes:
+                notes += "Filtering Via AMSIX Route Server;"
+
+            if ('147.28.242.0/24', '147.28.244.0/24') in prefixes:
+                notes += "Filtering Via AMSIX Falcon Route Server;"
+
+            if ('147.28.246.0/24', '147.28.247.0/24') in prefixes:
+                notes += "Filtering;"
+
+            if ('147.28.248.0/24', '147.28.249.0/24') in prefixes:
+                notes += "Filtering;"
+
+            sql_update = "UPDATE exp5_case_1_vp_stats "
+            sql_update += "SET notes = '{0}' WHERE (vp_asn = {1} AND vp_ip = '{2}');".format(notes, vp_asn, vp_ip)
+            cursor.execute(sql_update)
+
         conn.commit()
         cursor.close()
         conn.close()

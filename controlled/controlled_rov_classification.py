@@ -324,7 +324,6 @@ def main(args):
     with open(args.db_config, 'r') as f:
         db_config = json.load(f)
 
-    insert_into_db_table([raw_data_to_str(rd) for rd in raw_data], 'raw_data', get_connect_str_from_config(db_config))
     add_missing_routes(config_files, vp_routes, args.day)
     case1_results = analyze_experiment5(config_files[5], vp_routes, args.day)
 

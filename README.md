@@ -3,7 +3,7 @@
 This page documents the methodologies discussed in [1] and provides codes and data to replicate the
 results from the paper. All referenced code can be found [here](https://github.com/RPKI/rov-measurement-code).
 
-[1] A. Reuter, R. Bush, I. Cunha, E. Katz-Bassett, T.C. Schmidt, M. Wählisch, Towards a Rigorous Methodology for Measuring Adoption of RPKI Route Validation and Filtering, ACM SIGCOMM CCR, Vol. 48, No. 1, pp. 19-27, January 2018.
+[1] A. Reuter, R. Bush, I. Cunha, E. Katz-Bassett, T.C. Schmidt, M. Wählisch, [Towards a Rigorous Methodology for Measuring Adoption of RPKI Route Validation and Filtering](https://ccronline.sigcomm.org/wp-content/uploads/2018/05/sigcomm-ccr-final134.pdf), ACM SIGCOMM CCR, Vol. 48, No. 1, pp. 19-27, January 2018.
 
 All code is written for Python 3.x and depends on python module [reuter_util](https://github.com/reuteran/reuter_util)
 
